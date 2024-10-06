@@ -6,7 +6,7 @@ import './header.scss';
 import './modal.scss';
 
 import { useAppDispatch, useAppSelector } from './redux/hooks';
-import { setUsername, clearUsername, selectUsername } from './redux/reducers/game';
+import { setUsername, clearUsername, selectUsername, setUserId, clearUserId } from './redux/reducers/game';
 import Modal from './modal';
 
 type LoginOrRegisterProps = {
@@ -27,8 +27,9 @@ function LoginOrRegister({url, submitText, onOpen, onClose, shown}: LoginOrRegis
     e.preventDefault();
     const result = await post(url, {username: username, password: password});
     if (result) {
-      const { username } = result;
+      const { username, userId } = result;
       dispatch(setUsername(username));
+      dispatch(setUserId(userId));
     }
     onClose();
   }
@@ -56,6 +57,7 @@ function Logout() {
     const result = await post("/logout", {});
     if (result) {
       dispatch(clearUsername());
+      dispatch(clearUserId());
     }
   }
 

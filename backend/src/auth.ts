@@ -47,7 +47,7 @@ export const login: RequestHandler = (req, res, next) => {
   req.session.username = user.username;
   req.session.userId = user.id;
   req.session.save()
-  res.json({username: user.username});
+  res.json({username: user.username, userId: user.id});
 }
 
 export const logout: RequestHandler = (req, res, next) => {
@@ -65,7 +65,7 @@ export const register: RequestHandler = (req, res, next) => {
   req.session.username = user.username;
   req.session.userId = user.id;
   req.session.save()
-  res.json({username: username});
+  res.json({username: username, userId: user.id});
 }
 
 export const authDetails: RequestHandler = (req, res, next) => {

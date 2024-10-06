@@ -1,24 +1,33 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
+import type { Game } from '../../common/game'
 
-export interface gameState {
+export interface GameData {
   error: string | null,
+  userId: number | null,
   username: string | null,
   gameId: number | null,
-  gameState: string[][] | null,
+  gameData: Game | null,
 }
 
-const initialState: gameState = {
+const initialState: GameData = {
   error: null,
+  userId: null,
   username: null,
   gameId: null,
-  gameState: null,
+  gameData: null,
 }
 
 export const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
+    setUserId: (state, action: PayloadAction<number>) => {
+      state.userId = action.payload;
+    },
+    clearUserId: (state) => {
+      state.userId = null;
+    },
     setUsername: (state, action: PayloadAction<string>) => {
       state.username = action.payload;
     },
@@ -34,19 +43,20 @@ export const gameSlice = createSlice({
     setGameId: (state, action: PayloadAction<number>) => {
       state.gameId = action.payload;
     },
-    setGameState: (state, action: PayloadAction<string[][]>) => {
-      state.gameState = action.payload;
+    setGameData: (state, action: PayloadAction<Game>) => {
+      state.gameData = action.payload;
     },
   },
   selectors: {
+    selectUserId: (sliceState) => sliceState.userId,
     selectError: (sliceState) => sliceState.error,
     selectUsername: (sliceState) => sliceState.username,
     selectGameId: (sliceState) => sliceState.gameId,
-    selectGameState: (sliceState) => sliceState.gameState,
+    selectGameData: (sliceState) => sliceState.gameData,
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUsername, clearUsername, setError, clearError, setGameId, setGameState } = gameSlice.actions
-export const { selectError, selectUsername, selectGameId, selectGameState } = gameSlice.selectors
+export const { setUsername, clearUsername, setError, clearError, setGameId, setGameData, setUserId, clearUserId } = gameSlice.actions
+export const { selectError, selectUsername, selectGameId, selectGameData, selectUserId } = gameSlice.selectors
 export default gameSlice.reducer

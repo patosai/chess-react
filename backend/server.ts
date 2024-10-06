@@ -15,7 +15,15 @@ const app = express();
 const PORT: number = 8800;
 
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server,
+  {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"],
+      credentials: true
+    }
+  }
+);
 
 app.use(cors);
 app.use(morgan('combined'));

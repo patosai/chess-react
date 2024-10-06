@@ -1,0 +1,1 @@
+Note that the common folder is inside frontend because create-react-app doesn't allow imports outside the src/ folder

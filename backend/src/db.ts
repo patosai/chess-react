@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import process from 'process';
 
 import { randomString } from './common';
+import type { GameState, Game, GameModel } from '../../frontend/src/common/game';
 
 export function hashPassword(password: string, salt: string) {
   return crypto.pbkdf2Sync(password, salt, 1000, 512, 'sha512').toString('hex');
@@ -22,24 +23,11 @@ type User = {
   salt: string,
 }
 
-type GameState = number[][]
 const DEFAULT_GAME_STATE = [
   [0, 0, 0],
   [0, 0, 0],
   [0, 0, 0]
 ]
-
-type GameModel = {
-  id: number,
-  userOneId: number,
-  userTwoId: number,
-  state: string,
-  currentTurnUserId: number,
-}
-
-export type Game = Omit<GameModel, "state"> & {
-  state: GameState
-}
 
 async function initDatabase() {
   if (!DATABASE) {
@@ -47,19 +35,19 @@ async function initDatabase() {
   }
 
   DATABASE.prepare(`CREATE TABLE "users" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "username" TEXT UNIQUE,
-    "password" TEXT,
-    "salt" TEXT
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    "username" TEXT UNIQUE NOT NULL,
+    "password" TEXT NOT NULL,
+    "salt" TEXT NOT NULL
     )`
   ).run();
 
   DATABASE.prepare(`CREATE TABLE "games" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "userOneId" INTEGER,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    "userOneId" INTEGER NOT NULL,
     "userTwoId" INTEGER,
-    "state" TEXT,
-    "currentTurnUserId" INTEGER,
+    "state" TEXT NOT NULL,
+    "currentTurnUserId" INTEGER NOT NULL,
     FOREIGN KEY(userOneId) REFERENCES users(id),
     FOREIGN KEY(userTwoId) REFERENCES users(id),
     FOREIGN KEY(currentTurnUserId) REFERENCES users(id)
@@ -124,7 +112,7 @@ export function joinGame(gameId: number | null, userId: number | null) {
     throw new Error("game is full");
   }
 
-  return DATABASE.prepare("UPDATE games SET userTwoId = ? WHERE gameId = ?").run(userId, gameId);
+  return DATABASE.prepare("UPDATE games SET userTwoId = ? WHERE id = ?").run(userId, gameId);
 }
 
 export function updateGame(gameId: number, newState: GameState, currentTurnUserId: number) {
@@ -138,18 +126,25 @@ export function updateGame(gameId: number, newState: GameState, currentTurnUserI
     throw new Error("game not found");
   }
 
-  DATABASE.prepare("UPDATE games SET state = ?, currentTurnUserId = ? WHERE gameId = ?").run(JSON.stringify(newState), currentTurnUserId, gameId);
+  DATABASE.prepare("UPDATE games SET state = ?, currentTurnUserId = ? WHERE id = ?").run(JSON.stringify(newState), currentTurnUserId, gameId);
 }
 
 export function getGame(gameId: number): Game {
   if (!gameId) {
     throw new Error("no game ID provided");
   }
-  const game = DATABASE.prepare("SELECT * FROM games WHERE id = ?").get(gameId) as GameModel
+  const game = DATABASE.prepare(`SELECT 
+    games.*, 
+    userOne.username AS userOneUsername, 
+    userTwo.username AS userTwoUsername 
+    FROM games
+    LEFT JOIN users userOne ON userOne.id = games.userOneId
+    LEFT JOIN users userTwo ON userTwo.id = games.userTwoId
+    WHERE games.id = ?
+   `).get(gameId) as GameModel
   if (!game) {
     throw new Error("game not found");
   }
-  console.log("original game state", game["state"]);
   game["state"] = JSON.parse(game["state"]);
   return (game as unknown) as Game;
 }

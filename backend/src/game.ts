@@ -1,10 +1,12 @@
 import { RequestHandler } from 'express';
 import { type Server } from 'socket.io';
+import logger from './logging';
 
 import { reqUserId } from './auth';
 
 import { createGame, getGame, joinGame, updateGame } from './db';
 import { SessionSocket } from './auth';
+import { canStart, moveValid } from '../../frontend/src/common/game';
 
 export const create: RequestHandler = (req, res, next) => {
   const userId = reqUserId(req);
@@ -16,28 +18,30 @@ export const join: RequestHandler = (req, res, next) => {
   const userId = reqUserId(req);
   const gameId = req.body.gameId;
   joinGame(gameId, userId);
-  console.log("getting game", getGame(gameId));
   res.json(getGame(gameId));
 }
 
 export function setupSockets(io: Server) {
-  // TODO authentication
   io.on('connection', (defaultSocket) => {
+    logger.info("socket connected");
     const socket = defaultSocket as SessionSocket;
+
     socket.on('join', (gameId) => {
+      logger.info(`joined room ${gameId}`)
       socket.join(gameId.toString());
+      logger.info(`emitting to room ${gameId.toString()}: ${JSON.stringify(getGame(gameId))}`)
+      io.to(gameId.toString()).emit('move', getGame(gameId));
     });
 
     socket.on('move', (gameId: number, row: number, col: number) => {
       const userId = socket.request.session.userId;
       const game = getGame(gameId);
-      if (userId && game.currentTurnUserId === userId) {
+      logger.info(`moved: userId ${userId}, gameId ${gameId}, gameCurrentTurn ${game.currentTurnUserId}, row ${row} col ${col}`)
+      if (userId && canStart(game) && game.currentTurnUserId === userId && moveValid(game.state, row, col)) {
         game.state[row][col] = userId;
         updateGame(gameId, game.state, game.userOneId === userId ? game.userTwoId : game.userOneId);
-        socket.to(gameId.toString()).emit('move', getGame(gameId));
+        io.to(gameId.toString()).emit('move', getGame(gameId));
       }
     });
-
   });
-
 }

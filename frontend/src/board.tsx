@@ -15,7 +15,7 @@ function BoardRow({row}: BoardRowProps) {
   return <div className="row">
     {range(BOARD_SIZE).map(colNum => {
       const key = row.toString() + "|" + colNum.toString();
-      return <BoardPiece key={key}></BoardPiece>
+      return <BoardPiece key={key} row={row} col={colNum}></BoardPiece>
     })}
   </div>
 }
@@ -24,7 +24,7 @@ export default function Board() {
   return (
     <div className="board">
       {range(BOARD_SIZE).map(rowNum => {
-        return <BoardRow row={rowNum}></BoardRow>
+        return <BoardRow key={rowNum} row={rowNum}></BoardRow>
       })}
     </div>
   )
