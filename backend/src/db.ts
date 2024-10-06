@@ -22,6 +22,25 @@ type User = {
   salt: string,
 }
 
+type GameState = number[][]
+const DEFAULT_GAME_STATE = [
+  [0, 0, 0],
+  [0, 0, 0],
+  [0, 0, 0]
+]
+
+type GameModel = {
+  id: number,
+  userOneId: number,
+  userTwoId: number,
+  state: string,
+  currentTurnUserId: number,
+}
+
+export type Game = Omit<GameModel, "state"> & {
+  state: GameState
+}
+
 async function initDatabase() {
   if (!DATABASE) {
     throw new Error("database is null")
@@ -40,8 +59,10 @@ async function initDatabase() {
     "userOneId" INTEGER,
     "userTwoId" INTEGER,
     "state" TEXT,
+    "currentTurnUserId" INTEGER,
     FOREIGN KEY(userOneId) REFERENCES users(id),
-    FOREIGN KEY(userTwoId) REFERENCES users(id)
+    FOREIGN KEY(userTwoId) REFERENCES users(id),
+    FOREIGN KEY(currentTurnUserId) REFERENCES users(id)
     )`
   ).run();
 }
@@ -52,19 +73,83 @@ process.on('exit', function() {
   DATABASE.close();
 });
 
-export function getUser(username: string, password: string): User | null {
+export function getUser(username: string, password: string): User {
   const user: User = (DATABASE.prepare('SELECT * FROM users WHERE username = ?').get(username)) as User;
   if (!user) {
-    return null;
+    throw new Error("user not found")
   }
+
   if (hashedPasswordsEqual(password, user.salt, user.password)) {
     return user;
   }
 
-  return null;
+  throw new Error("user not found")
 }
 
-export function createUser(username: string, password: string) {
+export function createUser(username: string, password: string): User {
   let salt = randomString(20);
-  return DATABASE.prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)").run(username, hashPassword(password, salt), salt);
+  DATABASE.prepare("INSERT INTO users (username, password, salt) VALUES (?, ?, ?)").run(username, hashPassword(password, salt), salt);
+  return DATABASE.prepare("SELECT * FROM users WHERE username = ?").get(username) as User;
+}
+
+export function createGame(userId: number | null): GameModel {
+  if (!userId) {
+    throw new Error("not authenticated");
+  }
+  const info = DATABASE.prepare("INSERT INTO games (userOneId, state, currentTurnUserId) VALUES (?, ?, ?)").run(userId, JSON.stringify(DEFAULT_GAME_STATE), userId);
+  const lastRowId = info.lastInsertRowid;
+  const game = DATABASE.prepare("SELECT * FROM games WHERE rowid = ?").get(lastRowId) as GameModel;
+  return game;
+}
+
+export function joinGame(gameId: number | null, userId: number | null) {
+  if (!userId) {
+    throw new Error("not authenticated");
+  }
+  if (!gameId) {
+    throw new Error("no game ID provided");
+  }
+
+  const game = DATABASE.prepare("SELECT * FROM games WHERE id = ?").get(gameId) as GameModel
+
+  if (!game) {
+    throw new Error("game not found");
+  }
+
+  if (game.userOneId === userId || game.userTwoId === userId) {
+    return;
+  }
+
+  if (game.userOneId && game.userTwoId) {
+    throw new Error("game is full");
+  }
+
+  return DATABASE.prepare("UPDATE games SET userTwoId = ? WHERE gameId = ?").run(userId, gameId);
+}
+
+export function updateGame(gameId: number, newState: GameState, currentTurnUserId: number) {
+  if (!gameId) {
+    throw new Error("no game ID provided");
+  }
+
+  const game = DATABASE.prepare("SELECT * FROM games WHERE id = ?").get(gameId) as GameModel
+
+  if (!game) {
+    throw new Error("game not found");
+  }
+
+  DATABASE.prepare("UPDATE games SET state = ?, currentTurnUserId = ? WHERE gameId = ?").run(JSON.stringify(newState), currentTurnUserId, gameId);
+}
+
+export function getGame(gameId: number): Game {
+  if (!gameId) {
+    throw new Error("no game ID provided");
+  }
+  const game = DATABASE.prepare("SELECT * FROM games WHERE id = ?").get(gameId) as GameModel
+  if (!game) {
+    throw new Error("game not found");
+  }
+  console.log("original game state", game["state"]);
+  game["state"] = JSON.parse(game["state"]);
+  return (game as unknown) as Game;
 }

@@ -1,7 +1,20 @@
 .app {
   display: flex;
-  min-height: 100vh;
   flex: 1;
   align-items: center;
   justify-content: center;
+  height: 100vh;
+}
+
+.controlBar {
+  margin-left: 5vw;
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    > * {
+      margin: 8px 0;
+
+    }
+  }
 }

@@ -5,8 +5,9 @@ type Body = {[key: string]: any};
 
 async function request(method: string, url: string, body?: Body) {
   try {
-    let params: { method: string, headers: Body, body?: string} = {
+    let params: RequestInit = {
       method: method,
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -28,8 +29,6 @@ async function request(method: string, url: string, body?: Body) {
     }
     return json;
   } catch (error: any) {
-    console.log("caught error");
-    console.log(error.toString());
     store.dispatch(setError(error.toString()));
     return null;
   }

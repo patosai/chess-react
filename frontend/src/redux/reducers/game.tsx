@@ -4,11 +4,15 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 export interface gameState {
   error: string | null,
   username: string | null,
+  gameId: number | null,
+  gameState: string[][] | null,
 }
 
 const initialState: gameState = {
   error: null,
   username: null,
+  gameId: null,
+  gameState: null,
 }
 
 export const gameSlice = createSlice({
@@ -27,14 +31,22 @@ export const gameSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setGameId: (state, action: PayloadAction<number>) => {
+      state.gameId = action.payload;
+    },
+    setGameState: (state, action: PayloadAction<string[][]>) => {
+      state.gameState = action.payload;
+    },
   },
   selectors: {
     selectError: (sliceState) => sliceState.error,
     selectUsername: (sliceState) => sliceState.username,
+    selectGameId: (sliceState) => sliceState.gameId,
+    selectGameState: (sliceState) => sliceState.gameState,
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUsername, clearUsername, setError, clearError } = gameSlice.actions
-export const { selectError, selectUsername } = gameSlice.selectors
+export const { setUsername, clearUsername, setError, clearError, setGameId, setGameState } = gameSlice.actions
+export const { selectError, selectUsername, selectGameId, selectGameState } = gameSlice.selectors
 export default gameSlice.reducer
