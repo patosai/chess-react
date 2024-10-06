@@ -48,6 +48,7 @@ async function initDatabase() {
     "userTwoId" INTEGER,
     "state" TEXT NOT NULL,
     "currentTurnUserId" INTEGER NOT NULL,
+    "finished" INTEGER NOT NULL,
     FOREIGN KEY(userOneId) REFERENCES users(id),
     FOREIGN KEY(userTwoId) REFERENCES users(id),
     FOREIGN KEY(currentTurnUserId) REFERENCES users(id)
@@ -84,7 +85,7 @@ export function createGame(userId: number | null): GameModel {
   if (!userId) {
     throw new Error("not authenticated");
   }
-  const info = DATABASE.prepare("INSERT INTO games (userOneId, state, currentTurnUserId) VALUES (?, ?, ?)").run(userId, JSON.stringify(DEFAULT_GAME_STATE), userId);
+  const info = DATABASE.prepare("INSERT INTO games (userOneId, state, currentTurnUserId, finished) VALUES (?, ?, ?, ?)").run(userId, JSON.stringify(DEFAULT_GAME_STATE), userId, 0);
   const lastRowId = info.lastInsertRowid;
   const game = DATABASE.prepare("SELECT * FROM games WHERE rowid = ?").get(lastRowId) as GameModel;
   return game;
@@ -126,7 +127,15 @@ export function updateGame(gameId: number, newState: GameState, currentTurnUserI
     throw new Error("game not found");
   }
 
+  if (game.finished) {
+    throw new Error("game already finished");
+  }
+
   DATABASE.prepare("UPDATE games SET state = ?, currentTurnUserId = ? WHERE id = ?").run(JSON.stringify(newState), currentTurnUserId, gameId);
+}
+
+export function markGameFinished(gameId: number) {
+  DATABASE.prepare("UPDATE games SET finished = ? WHERE id = ?").run(1, gameId);
 }
 
 export function getGame(gameId: number): Game {
@@ -145,6 +154,8 @@ export function getGame(gameId: number): Game {
   if (!game) {
     throw new Error("game not found");
   }
-  game["state"] = JSON.parse(game["state"]);
-  return (game as unknown) as Game;
+  const returnVal = (game as unknown) as Game;
+  returnVal["state"] = JSON.parse(game["state"]);
+  returnVal["finished"] = !!game["finished"]
+  return returnVal;
 }

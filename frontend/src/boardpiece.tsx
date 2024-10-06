@@ -13,8 +13,6 @@ type BoardPieceProps = {
 export default function BoardPiece({row, col}: BoardPieceProps) {
   const gameData: Game | null = useAppSelector(selectGameData);
 
-  console.log("got game data", gameData);
-
   if (!gameData) {
     return <div className="boardPiece">
     </div>

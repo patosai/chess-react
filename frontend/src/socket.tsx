@@ -15,8 +15,7 @@ export function connect(gameId: number) {
   socket.emit('join', gameId);
 }
 
-export function disconnect(gameId: number) {
-  socket.emit('leave', gameId);
+export function disconnect() {
   socket.disconnect();
 }
 

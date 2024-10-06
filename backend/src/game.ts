@@ -4,9 +4,9 @@ import logger from './logging';
 
 import { reqUserId } from './auth';
 
-import { createGame, getGame, joinGame, updateGame } from './db';
+import { createGame, getGame, joinGame, markGameFinished, updateGame } from './db';
 import { SessionSocket } from './auth';
-import { canStart, moveValid } from '../../frontend/src/common/game';
+import { canStart, moveValid, gameFinished } from '../../frontend/src/common/game';
 
 export const create: RequestHandler = (req, res, next) => {
   const userId = reqUserId(req);
@@ -40,6 +40,9 @@ export function setupSockets(io: Server) {
       if (userId && canStart(game) && game.currentTurnUserId === userId && moveValid(game.state, row, col)) {
         game.state[row][col] = userId;
         updateGame(gameId, game.state, game.userOneId === userId ? game.userTwoId : game.userOneId);
+        if (gameFinished(game.state)) {
+          markGameFinished(gameId);
+        }
         io.to(gameId.toString()).emit('move', getGame(gameId));
       }
     });

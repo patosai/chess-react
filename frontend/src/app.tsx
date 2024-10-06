@@ -6,16 +6,18 @@ import Board from './board';
 import Header from './header';
 import ErrorModal from './errormodal';
 import { get, post } from './request';
-import { setError, setUserId, clearUserId, setUsername, selectUsername, setGameId, selectGameId, selectGameData, selectUserId } from './redux/reducers/game';
+import { setError, setUserId, clearUserId, clearGameData, setUsername, selectUsername, setGameId, clearGameId, selectGameId, selectGameData, selectUserId } from './redux/reducers/game';
 import { useAppSelector, useAppDispatch } from './redux/hooks';
-import { connect as socketConnect } from './socket';
+import { connect as socketConnect, disconnect as socketDisconnect } from './socket';
 import { canStart } from './common/game';
+import { Game } from './common/game';
 
 function ControlBar() {
   const gameId = useAppSelector(selectGameId);
   const userId = useAppSelector(selectUserId);
   const dispatch = useAppDispatch();
 
+  console.log("my user id: " + userId);
   const gameData = useAppSelector(selectGameData);
 
   const [joinGameId, setJoinGameId] = useState<string>("");
@@ -33,6 +35,12 @@ function ControlBar() {
       dispatch(setGameId(gameIdNumber));
       socketConnect(gameIdNumber);
     }
+  }
+
+  async function leaveGame() {
+    dispatch(clearGameId())
+    dispatch(clearGameData());
+    socketDisconnect();
   }
 
   async function createGame() {
@@ -53,13 +61,13 @@ function ControlBar() {
       </form>
     </div>
   }
-  console.log(`my user id: ${userId}`)
 
   function renderInGame() {
     if (!gameData) return <></>;
     return (
       <div className="controls">
         <div>You are currently in game #{gameData.id}</div>
+        <div className="leave" onClick={leaveGame}>Leave game</div>
         <div>
           <h3>Players</h3>
           <div>
@@ -70,6 +78,9 @@ function ControlBar() {
           </div>
           <div className="turn">
             {canStart(gameData) && gameData.currentTurnUserId === userId && <div>It's your turn!</div>}
+          </div>
+          <div className="completed">
+            {gameData.finished && <h3>Game finished!</h3>}
           </div>
         </div>
       </div>
@@ -86,8 +97,10 @@ function ControlBar() {
 }
 
 export default function App() {
-  const username = useAppSelector(selectUsername);
+  const gameData: Game | null = useAppSelector(selectGameData);
   const dispatch = useAppDispatch();
+
+  console.log(`got game data: ${JSON.stringify(gameData)}`);
 
   async function getAuth() {
     const result = await get("/authDetails");

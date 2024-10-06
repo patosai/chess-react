@@ -22,4 +22,11 @@
       font-weight: bold;
     }
   }
+
+  .leave {
+    color: red;
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }

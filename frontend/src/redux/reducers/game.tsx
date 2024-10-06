@@ -43,8 +43,14 @@ export const gameSlice = createSlice({
     setGameId: (state, action: PayloadAction<number>) => {
       state.gameId = action.payload;
     },
+    clearGameId: (state) => {
+      state.gameId = null
+    },
     setGameData: (state, action: PayloadAction<Game>) => {
       state.gameData = action.payload;
+    },
+    clearGameData: (state) => {
+      state.gameData = null
     },
   },
   selectors: {
@@ -57,6 +63,6 @@ export const gameSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setUsername, clearUsername, setError, clearError, setGameId, setGameData, setUserId, clearUserId } = gameSlice.actions
+export const { setUsername, clearUsername, clearGameId, clearGameData, setError, clearError, setGameId, setGameData, setUserId, clearUserId } = gameSlice.actions
 export const { selectError, selectUsername, selectGameId, selectGameData, selectUserId } = gameSlice.selectors
 export default gameSlice.reducer
