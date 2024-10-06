@@ -4,6 +4,7 @@ import './app.scss';
 
 import Board from './board';
 import Header from './header';
+import ErrorModal from './errormodal';
 import { get } from './request';
 import { setError, setUsername, selectUsername } from './redux/reducers/game';
 import { useAppSelector, useAppDispatch } from './redux/hooks';
@@ -30,6 +31,7 @@ export default function App() {
       <div className="app">
         <Board/>
       </div>
+      <ErrorModal/>
     </>
   );
 }

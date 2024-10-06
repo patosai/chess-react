@@ -1,7 +1,9 @@
 import { setError, clearError, selectError } from './redux/reducers/game';
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 
-import './header.scss';
+import './modal.scss';
+
+import Modal from './modal';
 
 export default function ErrorModal() {
   const error = useAppSelector(selectError);
@@ -13,11 +15,10 @@ export default function ErrorModal() {
 
   return (
     <>
-    {error && <div className="midScreenModal">
+    {error && <Modal onClose={onClose}>
         <h2>Error</h2>
         {error}
-        <div onClick={onClose}>Close</div>
-      </div>}
+      </Modal>}
     </>
   );
 }

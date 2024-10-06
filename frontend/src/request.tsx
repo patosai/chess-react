@@ -28,6 +28,8 @@ async function request(method: string, url: string, body?: Body) {
     }
     return json;
   } catch (error: any) {
+    console.log("caught error");
+    console.log(error.toString());
     store.dispatch(setError(error.toString()));
     return null;
   }

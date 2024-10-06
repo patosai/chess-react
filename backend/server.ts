@@ -1,6 +1,8 @@
 import express from 'express';
+import { createServer } from 'node:http';
 import expressSession from 'express-session';
 import morgan from 'morgan';
+import { Server } from 'socket.io';
 
 import logger from './src/logging';
 
@@ -8,6 +10,9 @@ import { authDetails, cors, login, logout, register, ensureAuthenticated } from 
 
 const app = express();
 const PORT: number = 8800;
+
+const server = createServer(app);
+const io = new Server(server);
 
 app.use(cors);
 
@@ -28,6 +33,6 @@ app.get('/authDetails', authDetails);
 
 app.use(ensureAuthenticated);
 
-app.listen(PORT,() => {
+server.listen(PORT,() => {
   logger.info(`server running on localhost:${PORT}`)
 })

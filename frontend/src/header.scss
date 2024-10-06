@@ -18,7 +18,7 @@ header {
       display: flex;
     }
 
-    .right > * {
+    .right > .link {
       &:hover {
         cursor: pointer;
       }
@@ -26,13 +26,5 @@ header {
       margin-left: 16px;
     }
   }
-
 }
 
-.midScreenModal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  padding: 32px;
-  transform: translate(-50%, -50%);
-}
