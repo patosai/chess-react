@@ -1,0 +1,38 @@
+header {
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  .headerWrapper {
+    width: 60%;
+    align-self: center;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+
+    .left, .right {
+      align-items: center;
+      justify-content: center;
+      display: flex;
+    }
+
+    .right > * {
+      &:hover {
+        cursor: pointer;
+      }
+
+      margin-left: 16px;
+    }
+  }
+
+}
+
+.midScreenModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  padding: 32px;
+  transform: translate(-50%, -50%);
+}
