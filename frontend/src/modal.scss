@@ -1,3 +1,5 @@
+@import './common.scss';
+
 .modalWrapper {
   background: rgba(100, 100, 100, 0.3);
   position: fixed;
@@ -16,8 +18,9 @@
     background: #EEE;
 
     .close {
-      margin: 16px;
+      margin: 16px 0;
       padding: 16px;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;

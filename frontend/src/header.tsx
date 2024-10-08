@@ -42,7 +42,7 @@ function LoginOrRegister({url, submitText, onOpen, onClose, shown}: LoginOrRegis
         <form onSubmit={onSubmit}>
           <input name="username" value={username} placeholder={"Username"} onChange={e => setUsernameState(e.target.value)} />
           <input type="password" name="password" value={password} placeholder={"Password"} onChange={e => setPasswordState(e.target.value)} />
-          <input type="submit" value={submitText}/>
+          <button type="submit">{submitText}</button>
         </form>
       </Modal>}
       <div className="link" onClick={onOpen}>{submitText}</div>
@@ -83,9 +83,9 @@ export default function Header() {
         </div>
         <div className="right">
           {username && <div>Logged in as {username}</div>}
-          <LoginOrRegister url={"/login"} submitText={"Login"} onOpen={() => setShownModal("login")} onClose={onClose} shown={shownModal == "login"}/>
-          <LoginOrRegister url={"/register"} submitText={"Register"} onOpen={() => setShownModal("register")} onClose={onClose} shown={shownModal == "register"}/>
-          <Logout/>
+          {!username && <LoginOrRegister url={"/login"} submitText={"Login"} onOpen={() => setShownModal("login")} onClose={onClose} shown={shownModal == "login"}/>}
+          {!username && <LoginOrRegister url={"/register"} submitText={"Register"} onOpen={() => setShownModal("register")} onClose={onClose} shown={shownModal == "register"}/>}
+          {username && <Logout/>}
         </div>
       </div>
     </header>

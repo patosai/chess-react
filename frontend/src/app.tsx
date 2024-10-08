@@ -55,9 +55,10 @@ function ControlBar() {
   function renderNotInGame() {
     return <div className="controls">
       <button onClick={createGame}>Create game</button>
+      <hr/>
       <form onSubmit={joinGame}>
-        <input type="number" value={joinGameId} onChange={(e) => setJoinGameId(e.target.value)} />
-        <input type="submit" value="Join game" />
+        <input placeholder={"Game ID"} type="number" value={joinGameId} onChange={(e) => setJoinGameId(e.target.value)} />
+        <button type="submit">Join game</button>
       </form>
     </div>
   }
