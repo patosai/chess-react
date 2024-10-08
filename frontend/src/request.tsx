@@ -14,7 +14,7 @@ async function request(method: string, url: string, body?: Body) {
       },
     }
     let fullUrl = `http://localhost:8800${url}`
-    if (method == "GET" && body) {
+    if (method === "GET" && body) {
       throw new Error("GET with body not supported yet")
     }
     if (body) {

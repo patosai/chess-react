@@ -27,7 +27,7 @@ export default function BoardPiece({row, col}: BoardPieceProps) {
 
   const state = gameData.state;
   const hasPiece = !!state[row][col]
-  const isUserOnePiece = state[row][col] == gameData.userOneId;
+  const isUserOnePiece = state[row][col] === gameData.userOneId;
   return <div className="boardPiece" onClick={onClick}>
     {hasPiece && <div className={"piece " + (isUserOnePiece ? "white" : "black")}></div>}
   </div>

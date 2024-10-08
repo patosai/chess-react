@@ -18,7 +18,7 @@ export type Game = Omit<GameModel, "state"|"finished"> & {
 }
 
 export function moveValid(gameState: GameState, row: number, col: number) {
-  return !gameState[row][col];
+  return row >= 0 && row <= 2 && col >= 0 && col <= 2 && !gameState[row][col];
 }
 
 export function canStart(game: Game) {

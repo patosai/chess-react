@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
 import { post } from './request';
 
 import './header.scss';
@@ -83,8 +82,8 @@ export default function Header() {
         </div>
         <div className="right">
           {username && <div>Logged in as {username}</div>}
-          {!username && <LoginOrRegister url={"/login"} submitText={"Login"} onOpen={() => setShownModal("login")} onClose={onClose} shown={shownModal == "login"}/>}
-          {!username && <LoginOrRegister url={"/register"} submitText={"Register"} onOpen={() => setShownModal("register")} onClose={onClose} shown={shownModal == "register"}/>}
+          {!username && <LoginOrRegister url={"/login"} submitText={"Login"} onOpen={() => setShownModal("login")} onClose={onClose} shown={shownModal === "login"}/>}
+          {!username && <LoginOrRegister url={"/register"} submitText={"Register"} onOpen={() => setShownModal("register")} onClose={onClose} shown={shownModal === "register"}/>}
           {username && <Logout/>}
         </div>
       </div>

@@ -6,18 +6,16 @@ import Board from './board';
 import Header from './header';
 import ErrorModal from './errormodal';
 import { get, post } from './request';
-import { setError, setUserId, clearUserId, clearGameData, setUsername, selectUsername, setGameId, clearGameId, selectGameId, selectGameData, selectUserId } from './redux/reducers/game';
+import { clearGameData, setUsername, setGameId, clearGameId, selectGameData, selectUserId } from './redux/reducers/game';
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 import { connect as socketConnect, disconnect as socketDisconnect } from './socket';
 import { canStart } from './common/game';
 import { Game } from './common/game';
 
 function ControlBar() {
-  const gameId = useAppSelector(selectGameId);
   const userId = useAppSelector(selectUserId);
   const dispatch = useAppDispatch();
 
-  console.log("my user id: " + userId);
   const gameData = useAppSelector(selectGameData);
 
   const [joinGameId, setJoinGameId] = useState<string>("");
@@ -31,7 +29,6 @@ function ControlBar() {
 
     const result = await post("/join", {gameId: gameIdNumber});
     if (result) {
-      const { id } = result;
       dispatch(setGameId(gameIdNumber));
       socketConnect(gameIdNumber);
     }
@@ -113,7 +110,7 @@ export default function App() {
 
   useEffect(() => {
     getAuth();
-  }, []);
+  });
 
   return (
     <>

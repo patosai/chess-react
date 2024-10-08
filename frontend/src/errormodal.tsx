@@ -1,4 +1,4 @@
-import { setError, clearError, selectError } from './redux/reducers/game';
+import { clearError, selectError } from './redux/reducers/game';
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 
 import './modal.scss';

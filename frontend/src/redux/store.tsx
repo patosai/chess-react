@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { useDispatch } from 'react-redux'
 import gameReducer from './reducers/game';
 
 export const store = configureStore({

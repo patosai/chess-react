@@ -23,11 +23,13 @@ export default function Modal({visible=true, onClose, children}: ModalProps) {
   }
 
   return (
-    <div className="modalWrapper" onClick={innerOnClose}>
-      <div className="midScreenModal" onClick={(e) => e.stopPropagation()}>
-        {children}
-        <button className="close" onClick={innerOnClose}>Close</button>
-      </div>
-    </div>
+    <>
+      {shown && <div className="modalWrapper" onClick={innerOnClose}>
+        <div className="midScreenModal" onClick={(e) => e.stopPropagation()}>
+          {children}
+          <button className="close" onClick={innerOnClose}>Close</button>
+        </div>
+      </div>}
+    </>
   );
 }
